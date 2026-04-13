@@ -773,16 +773,17 @@
         case "youtube": {
           const vid = data.youtube_embed_id;
           if (vid) {
-            const src = `https://www.youtube.com/embed/${encodeURIComponent(vid)}?rel=0&modestbranding=1`;
+            const thumb = `https://img.youtube.com/vi/${encodeURIComponent(vid)}/hqdefault.jpg`;
+            const ytUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(vid)}`;
             html = `
-              <div class="modal-youtube-wrap">
-                <iframe
-                  id="modal-youtube-frame"
-                  src="${src}"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                  title="YouTube video"
-                ></iframe>
+              <div class="modal-youtube-wrap" style="position:relative;cursor:pointer;border-radius:8px;overflow:hidden;background:#000;" onclick="window.open('${ytUrl}','_blank')">
+                <img src="${thumb}" alt="YouTube video thumbnail" style="width:100%;display:block;opacity:0.85;" />
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                  <div style="width:72px;height:72px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:transform 0.15s;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                </div>
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:16px 14px 10px;color:#fff;font-size:0.85rem;">Click to watch on YouTube ↗</div>
               </div>
               ${data.caption ? `<p class="modal-caption" style="margin-top:10px">${escHtml(data.caption)}</p>` : ""}`;
           } else {
