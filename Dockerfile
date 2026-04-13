@@ -37,6 +37,10 @@ RUN curl -L --max-time 30 -o /app/static/demo/video.mp4 \
     "https://www.w3schools.com/html/mov_bbb.mp4" || \
     echo "WARNING: Could not download sample video — MyVid modal will show an error"
 
+# Collect static files during build phase
+# We provide a dummy SECRET_KEY and DATABASE_URL for the command to run without real deps
+RUN DJANGO_SECRET_KEY=build-time-secret DATABASE_URL=sqlite:///:memory: python manage.py collectstatic --noinput
+
 # Environment
 ENV DJANGO_SETTINGS_MODULE=core.settings
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -45,10 +49,5 @@ ENV DEBUG=False
 
 EXPOSE 8000
 
-# Entrypoint: migrate, seed, collect static, then run gunicorn
-CMD ["sh", "-c", "\
-    python manage.py migrate --noinput && \
-    python manage.py seed_data && \
-    python manage.py collectstatic --noinput --clear && \
-    gunicorn core.wsgi:application --bind 0.0.0.0:8000 \
-"]
+# Entrypoint: Start gunicorn immediately (initialization handled by Render Release Phase)
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
