@@ -208,8 +208,8 @@ class Command(BaseCommand):
             term="YouTube",
             media_type=MediaContent.MEDIA_TYPE_YOUTUBE,
             defaults={
-                "youtube_url": "https://www.youtube.com/watch?v=fS5z7-0mY_Y",
-                "caption": "Django in 100 Seconds",
+                "youtube_url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+                "caption": "Me at the zoo - YouTube First Video",
                 "is_dashboard": True,
             },
         )
