@@ -203,13 +203,13 @@ class Command(BaseCommand):
             },
         )
 
-        mc_dash_youtube, _ = MediaContent.objects.get_or_create(
+        mc_dash_youtube, _ = MediaContent.objects.update_or_create(
             subject=subject,
             term="YouTube",
             media_type=MediaContent.MEDIA_TYPE_YOUTUBE,
             defaults={
                 "youtube_url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-                "caption": "Me at the zoo - YouTube First Video",
+                "caption": "Me at the zoo - YouTube's First Video",
                 "is_dashboard": True,
             },
         )
