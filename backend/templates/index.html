@@ -1,0 +1,852 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An interactive teaching platform that transforms text into multimedia educational experiences with clickable hotspots." />
+  <title>Interactive Teaching Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─────────────────────────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-dark:  #3730A3;
+      --purple-mid:   #4F46E5;
+      --purple-light: #6D28D9;
+      --indigo-900:   #1E1B4B;
+      --header-from:  #3730A3;
+      --header-to:    #6D28D9;
+      --accent-blue:  #2563EB;
+      --hotspot-red:  #DC2626;
+      --text-dark:    #1e293b;
+      --text-mid:     #475569;
+      --border-color: #e2e8f0;
+      --bg-page:      #f8fafc;
+      --bg-white:     #ffffff;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+      --shadow-modal: 0 20px 60px rgba(0,0,0,.30);
+      --radius:       6px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', 'Hind Siliguri', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-dark);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────────────────────────── */
+    #site-header {
+      background: linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%);
+      color: #fff;
+      text-align: center;
+      padding: 32px 24px 30px;
+    }
+
+    #site-header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    #site-header p {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       MAIN LAYOUT
+    ───────────────────────────────────────────────────────────── */
+    #page-wrapper {
+      display: flex;
+      gap: 0;
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 16px;
+      align-items: flex-start;
+    }
+
+    /* ── Left (main) panel ── */
+    #main-panel {
+      flex: 1 1 0;
+      min-width: 0;
+      background: var(--bg-white);
+      border-left: 5px solid var(--purple-mid);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 28px 30px;
+      margin-right: 20px;
+    }
+
+    /* ── Right sidebar ── */
+    #sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--bg-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 18px;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       SECTION HEADINGS
+    ───────────────────────────────────────────────────────────── */
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent-blue);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--indigo-900);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--purple-mid);
+      margin-bottom: 16px;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       MULTIMEDIA CONTENT EXAMPLES — DASHBOARD BUTTONS
+    ───────────────────────────────────────────────────────────── */
+    #examples-section {
+      margin-bottom: 36px;
+    }
+
+    .media-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .media-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.1s ease;
+      width: 100%;
+    }
+
+    .media-btn:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--purple-mid);
+      transform: translateY(-1px);
+    }
+
+    .media-btn:active { transform: translateY(0); }
+
+    .btn-type-icon {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    .btn-label { flex: 1; text-align: left; }
+
+    .btn-search-icon {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+    }
+
+    /* Icon colour helpers */
+    .icon-text   { color: #DC2626; font-weight: 800; font-size: 1rem; font-family: Georgia, serif; }
+    .icon-image  { color: #DC2626; }
+    .icon-audio  { color: #2563EB; }
+    .icon-video  { color: #DC2626; }
+    .icon-youtube { color: #DC2626; }
+
+    /* ─────────────────────────────────────────────────────────────
+       NEWS ARTICLE SECTION
+    ───────────────────────────────────────────────────────────── */
+    #article-section .article-body {
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text-dark);
+    }
+
+    #article-section .article-body p {
+      margin-bottom: 1rem;
+    }
+
+    /* ── Hotspot terms ── */
+    .hotspot {
+      color: var(--hotspot-red);
+      font-weight: 700;
+      cursor: pointer;
+      display: inline;
+      padding: 1px 2px;
+      border-radius: 2px;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .hotspot:hover {
+      background: rgba(220, 38, 38, 0.08);
+      text-decoration: underline;
+    }
+
+    .hotspot-icon {
+      font-size: 0.78rem;
+      margin-left: 3px;
+      vertical-align: middle;
+      opacity: 0.8;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       SIDEBAR — EXPANDABLE CONTENT ACCORDION
+    ───────────────────────────────────────────────────────────── */
+    .accordion { display: flex; flex-direction: column; gap: 8px; }
+
+    .accordion-item { border-radius: var(--radius); overflow: hidden; }
+
+    .accordion-btn {
+      width: 100%;
+      background: var(--purple-dark);
+      color: #fff;
+      border: none;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: var(--radius);
+      transition: background 0.15s ease;
+    }
+
+    .accordion-btn:hover { background: var(--purple-mid); }
+
+    .accordion-btn.open { border-radius: var(--radius) var(--radius) 0 0; }
+
+    .accordion-arrow {
+      font-size: 0.75rem;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .accordion-btn.open .accordion-arrow { transform: rotate(180deg); }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      background: #f1f5fb;
+      transition: max-height 0.3s ease, padding 0.2s ease;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 0 14px;
+    }
+
+    .accordion-content.open {
+      max-height: 600px;
+      padding: 12px 14px;
+    }
+
+    .accordion-content p,
+    .accordion-content ul,
+    .accordion-content li {
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+
+    .accordion-content a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+
+    .accordion-content a:hover { text-decoration: underline; }
+
+    /* ─────────────────────────────────────────────────────────────
+       MODAL OVERLAY
+    ───────────────────────────────────────────────────────────── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.18s ease;
+    }
+
+    #modal-overlay.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #modal-box {
+      background: var(--bg-white);
+      border-radius: 10px;
+      box-shadow: var(--shadow-modal);
+      position: relative;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.2s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(16px); opacity: 0.5; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    #modal-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-mid);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 4px;
+      z-index: 10;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    #modal-close:hover { color: var(--text-dark); background: var(--border-color); }
+
+    #modal-body { padding: 28px 32px 28px; }
+
+    /* ── Text modal ── */
+    .modal-text-content {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text-dark);
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    }
+
+    /* ── Image modal ── */
+    .modal-image-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-image-wrap img {
+      max-width: 100%;
+      max-height: 60vh;
+      border-radius: var(--radius);
+      object-fit: contain;
+    }
+
+    .modal-caption {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* ── Audio modal ── */
+    .modal-audio-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .modal-audio-wrap audio {
+      width: 100%;
+      border-radius: var(--radius);
+    }
+
+    /* ── Video modal ── */
+    .modal-video-wrap video {
+      width: 100%;
+      border-radius: var(--radius);
+      background: #000;
+    }
+
+    /* ── YouTube modal ── */
+    .modal-youtube-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    .modal-youtube-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── Loading state ── */
+    .modal-loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--purple-mid);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─────────────────────────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      #page-wrapper { flex-direction: column; }
+      #main-panel   { margin-right: 0; margin-bottom: 16px; }
+      #sidebar      { width: 100%; }
+      .media-buttons-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      #site-header h1 { font-size: 1.6rem; }
+      #main-panel { padding: 18px 16px; }
+      .media-buttons-grid { grid-template-columns: 1fr 1fr; }
+      #modal-body { padding: 20px 18px; }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       UTILITIES
+    ───────────────────────────────────────────────────────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════════════ -->
+  <header id="site-header" role="banner">
+    <h1>Interactive Teaching Platform</h1>
+    <p>Click on highlighted terms to explore multimedia content</p>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════
+       PAGE LAYOUT
+  ════════════════════════════════════════════════════════ -->
+  <div id="page-wrapper">
+
+    <!-- ── LEFT MAIN PANEL ───────────────────────────────── -->
+    <main id="main-panel" role="main">
+
+      {% if subject %}
+
+      <!-- Section A: Multimedia Content Examples -->
+      <section id="examples-section" aria-labelledby="examples-title">
+        <h2 id="examples-title" class="section-title">Multimedia Content Examples</h2>
+
+        <div class="media-buttons-grid" role="list">
+          {% for item in dashboard_media %}
+            <button
+              id="btn-{{ item.id }}"
+              class="media-btn"
+              data-media-id="{{ item.id }}"
+              aria-label="{{ item.term }} — {{ item.get_media_type_display }} modal"
+              role="listitem"
+            >
+              <span class="btn-type-icon" aria-hidden="true">
+                {% if item.media_type == 'text' %}<span class="icon-text">A</span>
+                {% elif item.media_type == 'image' %}🖼️
+                {% elif item.media_type == 'audio' %}🔊
+                {% elif item.media_type == 'local_video' %}📹
+                {% elif item.media_type == 'youtube' %}▶️
+                {% endif %}
+              </span>
+              <span class="btn-label">{{ item.term }}</span>
+              <span class="btn-search-icon" aria-hidden="true">🔍</span>
+            </button>
+          {% empty %}
+            <!-- Fallback static buttons if no seed data -->
+            <button id="btn-text-demo"  class="media-btn" data-media-type="text">
+              <span class="icon-text btn-type-icon">A</span>
+              <span class="btn-label">A Text</span><span class="btn-search-icon">🔍</span>
+            </button>
+            <button id="btn-image-demo" class="media-btn" data-media-type="image">
+              <span class="btn-type-icon">🖼️</span>
+              <span class="btn-label">Image</span><span class="btn-search-icon">🔍</span>
+            </button>
+            <button id="btn-audio-demo" class="media-btn" data-media-type="audio">
+              <span class="btn-type-icon">🔊</span>
+              <span class="btn-label">Audio</span><span class="btn-search-icon">🔍</span>
+            </button>
+            <button id="btn-video-demo" class="media-btn" data-media-type="local_video">
+              <span class="btn-type-icon">📹</span>
+              <span class="btn-label">MyVid</span><span class="btn-search-icon">🔍</span>
+            </button>
+            <button id="btn-youtube-demo" class="media-btn" data-media-type="youtube">
+              <span class="btn-type-icon">▶️</span>
+              <span class="btn-label">YouTube</span><span class="btn-search-icon">🔍</span>
+            </button>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Section B: News Article with Interactive Elements -->
+      <section id="article-section" aria-labelledby="article-title">
+        <h2 id="article-title" class="section-title">News Article with Interactive Elements</h2>
+        <div id="article-body" class="article-body">
+          {{ subject.body_html|safe }}
+        </div>
+      </section>
+
+      {% else %}
+        <div style="padding:40px;text-align:center;color:var(--text-mid)">
+          <p style="font-size:1.1rem;margin-bottom:12px">⚠ No content found.</p>
+          <p>Run <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">python manage.py seed_data</code> to populate the database.</p>
+        </div>
+      {% endif %}
+
+    </main>
+
+    <!-- ── RIGHT SIDEBAR ─────────────────────────────────── -->
+    <aside id="sidebar" aria-label="Expandable content navigation">
+      <h3 class="sidebar-title">Expandable Content</h3>
+
+      <div class="accordion" id="sidebar-accordion">
+
+        <div class="accordion-item">
+          <button
+            id="acc-btn-introduction"
+            class="accordion-btn"
+            aria-expanded="false"
+            aria-controls="acc-panel-introduction"
+          >
+            Introduction
+            <span class="accordion-arrow" aria-hidden="true">▼</span>
+          </button>
+          <div
+            id="acc-panel-introduction"
+            class="accordion-content"
+            role="region"
+            aria-labelledby="acc-btn-introduction"
+          >
+            {% if subject %}
+              {{ subject.introduction|safe|default:"<p>Introduction content coming soon.</p>" }}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button
+            id="acc-btn-explanation"
+            class="accordion-btn"
+            aria-expanded="false"
+            aria-controls="acc-panel-explanation"
+          >
+            Detailed Explanation
+            <span class="accordion-arrow" aria-hidden="true">▼</span>
+          </button>
+          <div
+            id="acc-panel-explanation"
+            class="accordion-content"
+            role="region"
+            aria-labelledby="acc-btn-explanation"
+          >
+            {% if subject %}
+              {{ subject.detailed_explanation|safe|default:"<p>Detailed explanation coming soon.</p>" }}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button
+            id="acc-btn-resources"
+            class="accordion-btn"
+            aria-expanded="false"
+            aria-controls="acc-panel-resources"
+          >
+            Additional Resources
+            <span class="accordion-arrow" aria-hidden="true">▼</span>
+          </button>
+          <div
+            id="acc-panel-resources"
+            class="accordion-content"
+            role="region"
+            aria-labelledby="acc-btn-resources"
+          >
+            {% if subject %}
+              {{ subject.additional_resources|safe|default:"<p>Additional resources coming soon.</p>" }}
+            {% endif %}
+          </div>
+        </div>
+
+      </div><!-- /.accordion -->
+    </aside>
+
+  </div><!-- /#page-wrapper -->
+
+
+  <!-- ════════════════════════════════════════════════════════
+       MODAL OVERLAY
+  ════════════════════════════════════════════════════════ -->
+  <div
+    id="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Multimedia content"
+    tabindex="-1"
+  >
+    <div id="modal-box">
+      <button id="modal-close" aria-label="Close modal">&#x00D7;</button>
+      <div id="modal-body">
+        <!-- Injected by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════════════════════ -->
+  <script>
+    "use strict";
+
+    // ── Config ────────────────────────────────────────────────
+    const API_BASE = "/api";
+
+    // ── Cache DOM references ──────────────────────────────────
+    const overlay    = document.getElementById("modal-overlay");
+    const modalBox   = document.getElementById("modal-box");
+    const modalBody  = document.getElementById("modal-body");
+    const closeBtn   = document.getElementById("modal-close");
+
+    // ── Accordion logic ───────────────────────────────────────
+    document.querySelectorAll(".accordion-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const panelId = btn.getAttribute("aria-controls");
+        const panel   = document.getElementById(panelId);
+        const isOpen  = btn.classList.contains("open");
+
+        // Close all
+        document.querySelectorAll(".accordion-btn").forEach((b) => {
+          b.classList.remove("open");
+          b.setAttribute("aria-expanded", "false");
+        });
+        document.querySelectorAll(".accordion-content").forEach((p) => {
+          p.classList.remove("open");
+        });
+
+        // Open clicked (toggle)
+        if (!isOpen) {
+          btn.classList.add("open");
+          btn.setAttribute("aria-expanded", "true");
+          panel.classList.add("open");
+        }
+      });
+    });
+
+    // ── Modal: open/close ─────────────────────────────────────
+    function openModal() {
+      overlay.classList.add("active");
+      overlay.focus();
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      overlay.classList.remove("active");
+      document.body.style.overflow = "";
+      // Stop any playing media
+      modalBody.querySelectorAll("audio, video").forEach((el) => {
+        el.pause();
+        el.currentTime = 0;
+      });
+      // Clear YouTube iframes to stop playback
+      modalBody.querySelectorAll("iframe").forEach((el) => {
+        el.src = el.src; // reload stops playback
+      });
+      modalBody.innerHTML = "";
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    // ── Modal: render by media type ───────────────────────────
+    function renderModal(data) {
+      let html = "";
+
+      switch (data.media_type) {
+
+        case "text":
+          html = `<div class="modal-text-content">${
+            (data.text_content || "").replace(/\n/g, "<br>")
+          }</div>`;
+          break;
+
+        case "image":
+          if (data.file_url) {
+            html = `
+              <div class="modal-image-wrap">
+                <img src="${escHtml(data.file_url)}"
+                     alt="${escHtml(data.caption || data.term)}"
+                     loading="lazy" />
+                ${data.caption ? `<p class="modal-caption">${escHtml(data.caption)}</p>` : ""}
+              </div>`;
+          } else {
+            html = `<p class="modal-text-content">⚠ Image not available.</p>`;
+          }
+          break;
+
+        case "audio":
+          if (data.file_url) {
+            html = `
+              <div class="modal-audio-wrap">
+                ${data.caption ? `<p style="margin-bottom:8px;font-size:.9rem;color:#475569">${escHtml(data.caption)}</p>` : ""}
+                <audio controls preload="auto" id="modal-audio-player">
+                  <source src="${escHtml(data.file_url)}" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>`;
+          } else {
+            html = `<p class="modal-text-content">⚠ Audio file not available.</p>`;
+          }
+          break;
+
+        case "local_video":
+          if (data.file_url) {
+            html = `
+              <div class="modal-video-wrap">
+                ${data.caption ? `<p style="margin-bottom:8px;font-size:.9rem;color:#475569">${escHtml(data.caption)}</p>` : ""}
+                <video controls preload="metadata" id="modal-video-player">
+                  <source src="${escHtml(data.file_url)}" type="video/mp4" />
+                  Your browser does not support HTML5 video.
+                </video>
+              </div>`;
+          } else {
+            html = `<p class="modal-text-content">⚠ Video file not available.</p>`;
+          }
+          break;
+
+        case "youtube": {
+          const vid = data.youtube_embed_id;
+          if (vid) {
+            const src = `https://www.youtube.com/embed/${encodeURIComponent(vid)}` +
+                        `?autoplay=0&rel=0&modestbranding=1`;
+            html = `
+              <div class="modal-youtube-wrap">
+                <iframe
+                  id="modal-youtube-frame"
+                  src="${src}"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  title="YouTube video"
+                ></iframe>
+              </div>
+              ${data.caption ? `<p class="modal-caption" style="margin-top:10px">${escHtml(data.caption)}</p>` : ""}`;
+          } else {
+            html = `<p class="modal-text-content">⚠ YouTube video not available.</p>`;
+          }
+          break;
+        }
+
+        default:
+          html = `<p class="modal-text-content">⚠ Unknown media type: ${escHtml(data.media_type)}</p>`;
+      }
+
+      modalBody.innerHTML = html;
+    }
+
+    // ── Fetch media and show modal ────────────────────────────
+    async function showMediaModal(mediaId) {
+      // Show loading state
+      modalBody.innerHTML = `
+        <div class="modal-loading">
+          <div class="spinner"></div>
+          <p>Loading content&hellip;</p>
+        </div>`;
+      openModal();
+
+      try {
+        const resp = await fetch(`${API_BASE}/media/${mediaId}/`, {
+          headers: { "Accept": "application/json" },
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        renderModal(data);
+      } catch (err) {
+        modalBody.innerHTML = `
+          <div class="modal-text-content" style="color:#DC2626">
+            ⚠ Could not load content (${escHtml(err.message)}).<br>
+            Please try again or check the API.
+          </div>`;
+        console.error("Modal fetch error:", err);
+      }
+    }
+
+    // ── Event delegation for hotspot clicks ──────────────────
+    // Handles both article hotspot spans AND dashboard buttons
+    document.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-media-id]");
+      if (!target) return;
+      e.preventDefault();
+      const mediaId = target.dataset.mediaId;
+      if (mediaId) showMediaModal(mediaId);
+    });
+
+    // ── Security helper ───────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+
+</body>
+</html>
