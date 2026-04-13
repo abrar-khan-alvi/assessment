@@ -208,8 +208,8 @@ class Command(BaseCommand):
             term="YouTube",
             media_type=MediaContent.MEDIA_TYPE_YOUTUBE,
             defaults={
-                "youtube_url": "https://www.youtube.com/watch?v=9bZkp7q19f0",
-                "caption": "PSY — Gangnam Style",
+                "youtube_url": "https://www.youtube.com/watch?v=fS5z7-0mY_Y",
+                "caption": "Django in 100 Seconds",
                 "is_dashboard": True,
             },
         )
